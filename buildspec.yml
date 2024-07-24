@@ -16,18 +16,18 @@ phases:
       - echo "Checking PATH..."
       - echo $PATH
       - echo "Listing installed packages..."
-      - source venv/bin/activate
       - pip list
   build:
     commands:
       - echo "Running cicdlambda..."
-      - source venv/bin/activate
       - python lambda_function.py || { echo "cicdlambda command failed"; exit 1; }
       - echo "Zipping deployment package..."
-      - deactivate
       - zip -r9 deployment_package.zip . -x "*.git*" -x "*.github*" -x "buildspec.yml" -x "venv/*"
+      - ls -l deployment_package.zip
   post_build:
     commands:
+      - echo "Checking if deployment_package.zip exists..."
+      - if [ ! -f deployment_package.zip ]; then echo "Deployment package not found!"; exit 1; fi
       - echo "Updating lambda Function..."
       - aws lambda update-function-code --function-name cicdlambda --zip-file fileb://deployment_package.zip
       - echo "DONE!!"
