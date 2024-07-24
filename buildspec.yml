@@ -20,16 +20,16 @@ phases:
       - pip list
   build:
     commands:
-      - echo "Running github-to-lambda..."
+      - echo "Running cicdlambda..."
       - source venv/bin/activate
-      - python lambda_function.py || { echo "github-to-lambda command failed"; exit 1; }
+      - python lambda_function.py || { echo "cicdlambda command failed"; exit 1; }
       - echo "Zipping deployment package..."
       - deactivate
       - zip -r9 deployment_package.zip . -x "*.git*" -x "*.github*" -x "buildspec.yml" -x "venv/*"
   post_build:
     commands:
       - echo "Updating lambda Function..."
-      - aws lambda update-function-code --function-name github-to-lambda --zip-file fileb://deployment_package.zip
+      - aws lambda update-function-code --function-name cicdlambda --zip-file fileb://deployment_package.zip
       - echo "DONE!!"
 artifacts:
   files:
